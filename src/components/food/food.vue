@@ -36,7 +36,23 @@
 
 				<div class="rating">
 					<h1 class="title">商品评价</h1>
-					<ratingselect :ratings="food.ratings" :select-type="food.selectType" :only-content="onlyContent"></ratingselect>
+					<ratingselect :ratings="food.ratings" :select-type="selectType" :only-content="onlyContent" :desc="desc"></ratingselect>
+
+                    <div class="rating-wrapper">
+                        <ul v-show="food.ratings && food.ratings.length">
+                            <li class="rating-item" v-for="rating in food.ratings" v-show="needShow(rating.rateType,rating.text)">
+                                <div class="user">
+                                    <span class="name">{{rating.username}}</span>
+                                    <img :src="rating.avatar" class="avatar" width="12">
+                                </div>
+                                <div class="time">{{rating.ratetime}}</div>
+                                <div class="text">
+                                    <span :class="{'icon-thumb_down': rating.rateType === 1 ,'icon-thumb_up': rating.rateType === 0}"></span>{{rating.text}}
+                                </div>
+                            </li>
+                        </ul>
+                        <div class="no-rating" v-show="!food.ratings || !food.ratings.length">暂无评价~</div>
+                    </div>
 				</div>
 
 			</div>
@@ -50,13 +66,23 @@ import BScroll from "better-scroll";
 import cartcontrol from "@/components/cartcontrol/cartcontrol";
 import split from "@/components/split/split";
 import ratingselect from "@/components/ratingselect/ratingselect";
+import Bus from "../../common/js/EventBus.js";
 
+const POSITIVE = 0;
+const NEGATIVE = 1;
+const ALL = 2;
 
 export default{
 	data(){
 		return{
 			showFlag: false,
-			onlyContent: true
+            selectType: ALL,
+			onlyContent: false,
+            desc: {
+                all: "全部",
+                positive: "推荐",
+                negative: "吐槽"
+            }
 		}
 	},
 	props: ["food"],
@@ -83,14 +109,49 @@ export default{
 		//点击加入购物车
 		addFirst(){
 			vue.set(this.food,'count',1);
-		}
+		},
+        //评价列表联动
+        needShow(type,text){
+            if(this.onlyContent && !text){
+                return false
+            }
+            if(this.selectType === ALL){
+                return true
+            }
+            else{
+                return this.selectType === type
+            }
+        }
 	},
+    created(){
+        Bus.$on("ratingtype.select", type =>{
+            this.selectType = type;
+            this.$nextTick(() =>{
+                this.scroll.refresh();
+            })
+        });
+        Bus.$on("content.toggle", onlyContent =>{
+            this.onlyContent = onlyContent;
+            this.$nextTick(() =>{
+                this.scroll.refresh();
+            })
+        })
+    }
 }
 </script>
 
 <style lang="scss" scoped>
+.icon-thumb_down:before {
+  content: "\e908";
+}
+.icon-thumb_up:before {
+  content: "\e909";
+}
 .icon-arrow_lift:before {
   content: "\e901";
+}
+li{
+    list-style: none
 }
 .food {
     position: fixed;
