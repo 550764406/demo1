@@ -66,7 +66,7 @@ import BScroll from "better-scroll";
 import cartcontrol from "@/components/cartcontrol/cartcontrol";
 import split from "@/components/split/split";
 import ratingselect from "@/components/ratingselect/ratingselect";
-import Bus from "../../common/js/EventBus.js";
+import Bus from "@/common/js/EventBus.js";
 
 const POSITIVE = 0;
 const NEGATIVE = 1;

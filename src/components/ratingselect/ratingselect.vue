@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import Bus from "../../common/js/EventBus.js";
+import Bus from "@/common/js/EventBus.js";
 
 const POSITIVE = 0;
 const NEGATIVE = 1;
